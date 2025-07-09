@@ -124,62 +124,62 @@ if __name__ == "__main__":
 
 
             ############### FULL ###############
-            eval_ade_batch_errors = np.array([])
-            eval_fde_batch_errors = np.array([])
-            eval_kde_nll = np.array([])
-            eval_road_viols = np.array([])
-            print("-- Evaluating Full")
-            for scene in tqdm(scenes):
-                timesteps = np.arange(scene.timesteps)
-                predictions = eval_stg.predict(scene,
-                                               timesteps,
-                                               ph,
-                                               num_samples=2000,
-                                               min_future_timesteps=8,
-                                               z_mode=False,
-                                               gmm_mode=False,
-                                               full_dist=False)
+        #     eval_ade_batch_errors = np.array([])
+        #     eval_fde_batch_errors = np.array([])
+        #     eval_kde_nll = np.array([])
+        #     eval_road_viols = np.array([])
+        #     print("-- Evaluating Full")
+        #     for scene in tqdm(scenes):
+        #         timesteps = np.arange(scene.timesteps)
+        #         predictions = eval_stg.predict(scene,
+        #                                        timesteps,
+        #                                        ph,
+        #                                        num_samples=2000,
+        #                                        min_future_timesteps=8,
+        #                                        z_mode=False,
+        #                                        gmm_mode=False,
+        #                                        full_dist=False)
 
-                if not predictions:
-                    continue
+        #         if not predictions:
+        #             continue
 
-                prediction_dict, _, _ = utils.prediction_output_to_trajectories(predictions,
-                                                                                scene.dt,
-                                                                                max_hl,
-                                                                                ph,
-                                                                                prune_ph_to_future=False)
+        #         prediction_dict, _, _ = utils.prediction_output_to_trajectories(predictions,
+        #                                                                         scene.dt,
+        #                                                                         max_hl,
+        #                                                                         ph,
+        #                                                                         prune_ph_to_future=False)
 
-                eval_road_viols_batch = []
-                for t in prediction_dict.keys():
-                    for node in prediction_dict[t].keys():
-                        if node.type == args.node_type:
-                            viols = compute_road_violations(prediction_dict[t][node],
-                                                            scene.map[args.node_type],
-                                                            channel=0)
-                            if viols == 2000:
-                                viols = 0
+        #         eval_road_viols_batch = []
+        #         for t in prediction_dict.keys():
+        #             for node in prediction_dict[t].keys():
+        #                 if node.type == args.node_type:
+        #                     viols = compute_road_violations(prediction_dict[t][node],
+        #                                                     scene.map[args.node_type],
+        #                                                     channel=0)
+        #                     if viols == 2000:
+        #                         viols = 0
 
-                            eval_road_viols_batch.append(viols)
+        #                     eval_road_viols_batch.append(viols)
 
-                eval_road_viols = np.hstack((eval_road_viols, eval_road_viols_batch))
+        #         eval_road_viols = np.hstack((eval_road_viols, eval_road_viols_batch))
 
-                batch_error_dict = evaluation.compute_batch_statistics(predictions,
-                                                                       scene.dt,
-                                                                       max_hl=max_hl,
-                                                                       ph=ph,
-                                                                       node_type_enum=env.NodeType,
-                                                                       map=None,
-                                                                       prune_ph_to_future=False)
+        #         batch_error_dict = evaluation.compute_batch_statistics(predictions,
+        #                                                                scene.dt,
+        #                                                                max_hl=max_hl,
+        #                                                                ph=ph,
+        #                                                                node_type_enum=env.NodeType,
+        #                                                                map=None,
+        #                                                                prune_ph_to_future=False)
 
-                eval_ade_batch_errors = np.hstack((eval_ade_batch_errors, batch_error_dict[args.node_type]['ade']))
-                eval_fde_batch_errors = np.hstack((eval_fde_batch_errors, batch_error_dict[args.node_type]['fde']))
-                eval_kde_nll = np.hstack((eval_kde_nll, batch_error_dict[args.node_type]['kde']))
+        #         eval_ade_batch_errors = np.hstack((eval_ade_batch_errors, batch_error_dict[args.node_type]['ade']))
+        #         eval_fde_batch_errors = np.hstack((eval_fde_batch_errors, batch_error_dict[args.node_type]['fde']))
+        #         eval_kde_nll = np.hstack((eval_kde_nll, batch_error_dict[args.node_type]['kde']))
 
-        pd.DataFrame({'value': eval_ade_batch_errors, 'metric': 'ade', 'type': 'full'}
-                     ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_ade_full.csv'))
-        pd.DataFrame({'value': eval_fde_batch_errors, 'metric': 'fde', 'type': 'full'}
-                     ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_fde_full.csv'))
-        pd.DataFrame({'value': eval_kde_nll, 'metric': 'kde', 'type': 'full'}
-                     ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_kde_full.csv'))
-        pd.DataFrame({'value': eval_road_viols, 'metric': 'road_viols', 'type': 'full'}
-                     ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_rv_full.csv'))
+        # pd.DataFrame({'value': eval_ade_batch_errors, 'metric': 'ade', 'type': 'full'}
+        #              ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_ade_full.csv'))
+        # pd.DataFrame({'value': eval_fde_batch_errors, 'metric': 'fde', 'type': 'full'}
+        #              ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_fde_full.csv'))
+        # pd.DataFrame({'value': eval_kde_nll, 'metric': 'kde', 'type': 'full'}
+        #              ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_kde_full.csv'))
+        # pd.DataFrame({'value': eval_road_viols, 'metric': 'road_viols', 'type': 'full'}
+        #              ).to_csv(os.path.join(args.output_path, args.output_tag + "_" + str(ph) + '_rv_full.csv'))
