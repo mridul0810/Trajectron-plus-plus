@@ -135,9 +135,6 @@ def main():
         if len(node_type_data_set) == 0:
             continue
 
-        if node_type_data_set.node_type == 'VEHICLE':
-            continue  # Skip VEHICLE node type for now, as it is not used in the training.
-
         node_type_dataloader = utils.data.DataLoader(node_type_data_set,
                                                      collate_fn=collate,
                                                      pin_memory=False if args.device is 'cpu' else True,
@@ -179,9 +176,6 @@ def main():
         eval_data_loader = dict()
         for node_type_data_set in eval_dataset:
             if len(node_type_data_set) == 0:
-                continue
-
-            if node_type_data_set.node_type == 'VEHICLE':
                 continue
 
             node_type_dataloader = utils.data.DataLoader(node_type_data_set,
@@ -252,6 +246,8 @@ def main():
         model_registrar.to(args.device)
         train_dataset.augment = args.augment
         for node_type, data_loader in train_data_loader.items():
+            if node_type != 'PEDESTRIAN':
+                continue
             curr_iter = curr_iter_node_type[node_type]
             pbar = tqdm(data_loader, ncols=80)
             for batch in pbar:
@@ -371,6 +367,8 @@ def main():
             with torch.no_grad():
                 # Calculate evaluation loss
                 for node_type, data_loader in eval_data_loader.items():
+                    if node_type != 'PEDESTRIAN':
+                        continue
                     eval_loss = []
                     print(f"Starting Evaluation @ epoch {epoch} for node type: {node_type}")
                     pbar = tqdm(data_loader, ncols=80)
@@ -444,3 +442,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    

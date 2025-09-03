@@ -134,7 +134,7 @@ if __name__ == "__main__":
         #         predictions = eval_stg.predict(scene,
         #                                        timesteps,
         #                                        ph,
-        #                                        num_samples=2000,
+        #                                        num_samples=100,
         #                                        min_future_timesteps=8,
         #                                        z_mode=False,
         #                                        gmm_mode=False,
